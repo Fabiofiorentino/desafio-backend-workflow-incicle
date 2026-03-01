@@ -1,0 +1,42 @@
+version: '3.9'
+
+services:
+  api:
+    build: .
+    container_name: workflow-incicle-api
+    ports:
+      - "${APP_PORT}:3000"
+    env_file:
+      - .env
+    depends_on:
+      - postgres
+      - rabbitmq
+    command: npm run start:dev
+    volumes:
+      - .:/app
+      - /app/node_modules
+    restart: always
+
+  postgres:
+    image: postgres:15
+    container_name: workflow-incicle-db
+    restart: always
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "${DB_PORT}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: workflow-incicle-rabbit
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    restart: always
+
+volumes:
+  pgdata:
