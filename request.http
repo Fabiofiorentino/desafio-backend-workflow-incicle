@@ -1,3 +1,63 @@
 ### Health check
 GET http://localhost:3000/health
 Accept: application/json
+
+@companyId = {{$processEnv COMPANY_ID}}
+@templateId = ''
+@versionId = ''
+@customerName = 'Admin'
+@orderId = '12345'
+
+### Create Template
+POST http://localhost:3000/templates
+Content-Type: application/json
+company-id: {{companyId}}
+
+{
+  "name": "Order Created",
+  "description": "Template for order creation",
+  "definition": {
+    "subject": "Order {{orderId}} created",
+    "body": "Customer {{customerName}}"
+  }
+}
+
+> {% 
+   client.global.set("templateId", response.body.id); 
+%}
+
+###
+
+### List Templates
+GET http://localhost:3000/templates
+company-id: {{companyId}}
+
+###
+
+### Get Template by ID
+GET http://localhost:3000/templates/{{templateId}}
+company-id: {{companyId}}
+
+###
+
+### Create New Version
+POST http://localhost:3000/templates/{{templateId}}/versions
+Content-Type: application/json
+company-id: {{companyId}}
+
+{
+  "definition": {
+    "subject": "UPDATED - Order {{orderId}} created",
+    "body": "Customer {{customerName}} - updated version"
+  }
+}
+
+> {% 
+   client.global.set("versionId", response.body.id); 
+%}
+
+###
+
+### Publish Version
+POST http://localhost:3000/templates/{{templateId}}/versions/{{versionId}}/publish
+company-id: {{companyId}}

@@ -1,10 +1,9 @@
 import { AppDataSource } from '../data-source';
-import { randomUUID } from 'crypto';
 
 async function run() {
   await AppDataSource.initialize();
 
-  const companyId = randomUUID();
+  const companyId = process.env.COMPANY_ID;
 
   await AppDataSource.query(`
     INSERT INTO company (id, name)
