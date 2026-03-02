@@ -1,31 +1,47 @@
-import { Entity, Column, ManyToOne, JoinColumn, Unique } from 'typeorm';
-import { BaseEntity } from '../../common/base.entity';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  JoinColumn,
+  CreateDateColumn,
+  Index,
+} from 'typeorm';
 import { Template } from './template.entity';
 
-export enum TemplateStatus {
+export enum TemplateVersionStatus {
   DRAFT = 'DRAFT',
   PUBLISHED = 'PUBLISHED',
 }
 
-@Entity()
-@Unique(['template', 'version_number'])
-export class TemplateVersion extends BaseEntity {
-  @ManyToOne(() => Template)
+@Entity('template_versions')
+@Index(['templateId', 'version'], { unique: true })
+export class TemplateVersion {
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
+
+  @Column({ name: 'template_id', type: 'uuid' })
+  templateId: string;
+
+  @ManyToOne(() => Template, (template) => template.versions, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'template_id' })
   template: Template;
 
-  @Column()
-  template_id: string;
+  @Column({ type: 'int' })
+  version: number;
 
-  @Column()
-  version_number: number;
-
-  @Column({ type: 'enum', enum: TemplateStatus })
-  status: TemplateStatus;
+  @Column({
+    type: 'enum',
+    enum: TemplateVersionStatus,
+    default: TemplateVersionStatus.DRAFT,
+  })
+  status: TemplateVersionStatus;
 
   @Column({ type: 'jsonb' })
-  definition: any;
+  definition: Record<string, any>;
 
-  @Column({ nullable: true })
-  published_at: Date;
+  @CreateDateColumn({ name: 'created_at' })
+  createdAt: Date;
 }
