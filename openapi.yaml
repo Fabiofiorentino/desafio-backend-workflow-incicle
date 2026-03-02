@@ -8,6 +8,96 @@ servers:
   - url: http://localhost:3000
     description: Local
 
+components:
+  parameters:
+    CompanyIdHeader:
+      name: x-company-id
+      in: header
+      required: true
+      schema:
+        type: string
+      description: Company identifier (multi-tenant)
+
+  schemas:
+    CreateTemplateDto:
+      type: object
+      required:
+        - name
+        - definition
+      properties:
+        name:
+          type: string
+          example: Aprovação Simples
+        description:
+          type: string
+          example: Template para workflow de aprovação de documentos
+        definition:
+          type: object
+          additionalProperties: true
+          example:
+            steps:
+              - name: Aprovador 1
+                type: approval
+
+    CreateVersionDto:
+      type: object
+      required:
+        - definition
+      properties:
+        definition:
+          type: object
+          additionalProperties: true
+
+    Template:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type: string
+        definition:
+          type: object
+        companyId:
+          type: string
+          format: uuid
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    TemplateVersion:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        templateId:
+          type: string
+          format: uuid
+        version:
+          type: integer
+        definition:
+          type: object
+        isActive:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: ok
+        info:
+          type: object
+
 paths:
   /health:
     get:
@@ -20,14 +110,171 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    example: ok
-                  info:
-                    type: object
+                $ref: '#/components/schemas/HealthResponse'
         '503':
           description: Dependência indisponível
 
-components: {}
+  /templates:
+    post:
+      summary: Criar novo template
+      tags:
+        - Templates
+      parameters:
+        - $ref: '#/components/parameters/CompanyIdHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTemplateDto'
+      responses:
+        '201':
+          description: Template criado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Template'
+        '400':
+          description: Dados inválidos
+        '401':
+          description: Não autenticado
+
+    get:
+      summary: Listar templates da empresa
+      tags:
+        - Templates
+      parameters:
+        - $ref: '#/components/parameters/CompanyIdHeader'
+      responses:
+        '200':
+          description: Lista de templates
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Template'
+        '401':
+          description: Não autenticado
+
+  /templates/{id}:
+    get:
+      summary: Obter template por ID
+      tags:
+        - Templates
+      parameters:
+        - $ref: '#/components/parameters/CompanyIdHeader'
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: ID do template
+      responses:
+        '200':
+          description: Detalhes do template
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Template'
+        '404':
+          description: Template não encontrado
+        '401':
+          description: Não autenticado
+
+  /templates/{id}/versions:
+    post:
+      summary: Criar nova versão do template
+      tags:
+        - Templates
+      parameters:
+        - $ref: '#/components/parameters/CompanyIdHeader'
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: ID do template
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateVersionDto'
+      responses:
+        '201':
+          description: Versão criada com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TemplateVersion'
+        '404':
+          description: Template não encontrado
+        '400':
+          description: Dados inválidos
+        '401':
+          description: Não autenticado
+
+    get:
+      summary: Listar versões do template
+      tags:
+        - Templates
+      parameters:
+        - $ref: '#/components/parameters/CompanyIdHeader'
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: ID do template
+      responses:
+        '200':
+          description: Lista de versões
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TemplateVersion'
+        '404':
+          description: Template não encontrado
+        '401':
+          description: Não autenticado
+
+  /templates/{id}/versions/{versionId}/publish:
+    post:
+      summary: Publicar versão (apenas uma permitida como ativa)
+      tags:
+        - Templates
+      parameters:
+        - $ref: '#/components/parameters/CompanyIdHeader'
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: ID do template
+        - name: versionId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: ID da versão
+      responses:
+        '200':
+          description: Versão publicada com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TemplateVersion'
+        '404':
+          description: Template ou versão não encontrado
+        '409':
+          description: Conflito ao publicar versão
+        '401':
+          description: Não autenticado
