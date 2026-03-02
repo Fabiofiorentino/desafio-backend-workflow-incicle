@@ -5,6 +5,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { RabbitModule } from './infra/rabbitmq/rabbit.module';
 import { HealthModule } from './infra/health/health.module';
+import { TemplatesModule } from './modules/templates/template.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { HealthModule } from './infra/health/health.module';
     }),
     RabbitModule,
     HealthModule,
+    TemplatesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
