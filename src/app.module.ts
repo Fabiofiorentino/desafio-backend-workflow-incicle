@@ -4,6 +4,7 @@ import { AppService } from './app.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { RabbitModule } from './infra/rabbitmq/rabbit.module';
+import { HealthModule } from './infra/health/health.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { RabbitModule } from './infra/rabbitmq/rabbit.module';
       }),
     }),
     RabbitModule,
+    HealthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
