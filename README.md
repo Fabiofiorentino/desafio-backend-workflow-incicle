@@ -18,25 +18,31 @@
 Estrutura baseada em separação por camadas:
 
 ````
-src/
-├── infra/
-│    ├── database/
-│    │    ├── migrations/
-│    │    ├── seeds/
-│    │    └── data-source.ts
-│    ├── messaging/
-│    └── health/
-├── modules/
-|    ├── approvals/
-|    ├── audit/
-|    ├── company/
-|    ├── delegations/
-|    ├── instances/
-|    ├── templates/
-|    ├── user/
-├── common/
-├── test/
-└── app.module.ts
+.
+├──src/
+|   ├── infra/
+|   │    ├── database/
+|   │    │    ├── migrations/
+|   │    │    ├── seeds/
+|   │    │    └── data-source.ts
+|   │    ├── messaging/
+|   │    └── health/
+|   ├── modules/
+|   |    ├── approvals/
+|   |    ├── audit/
+|   |    ├── company/
+|   |    ├── delegations/
+|   |    ├── instances/
+|   |    ├── templates/
+|   |    ├── user/
+|   ├── common/
+|   ├── test/
+├── app.module.ts
+├── openapi.yaml
+├── requests.http
+├── README.md
+├── docker-compose.yml
+└── Dockerfile
 ````
 
 ## Decisão
@@ -91,6 +97,12 @@ Migrations e seeds **não rodam automaticamente no container**.
 ### Trade-off
 
 Maior controle operacional
+
+---
+
+## Documentação
+
+A documentação da API está disponível em [http://localhost:8081](http://localhost:8081).
 
 ---
 

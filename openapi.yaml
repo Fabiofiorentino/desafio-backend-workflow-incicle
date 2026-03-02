@@ -1,0 +1,33 @@
+openapi: 3.0.3
+info:
+  title: Workflow InCicle API
+  version: 1.0.0
+  description: Desafio Backend Workflow InCicle
+
+servers:
+  - url: http://localhost:3000
+    description: Local
+
+paths:
+  /health:
+    get:
+      summary: Health check da aplicação
+      tags:
+        - Health
+      responses:
+        '200':
+          description: Aplicação saudável
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+                  info:
+                    type: object
+        '503':
+          description: Dependência indisponível
+
+components: {}

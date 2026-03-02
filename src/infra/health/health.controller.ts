@@ -1,5 +1,4 @@
 import { Controller, Get } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiOkResponse } from '@nestjs/swagger';
 import {
   HealthCheckService,
   TypeOrmHealthIndicator,
@@ -7,7 +6,6 @@ import {
 } from '@nestjs/terminus';
 import { RabbitService } from '../rabbitmq/rabbit.service';
 
-@ApiTags('health')
 @Controller('health')
 export class HealthController {
   constructor(
@@ -17,16 +15,12 @@ export class HealthController {
   ) {}
 
   @Get()
-  @ApiOperation({ summary: 'Verificação de liveness' })
-  @ApiOkResponse({ description: 'Serviço ativo' })
   liveness() {
     return { status: 'ok' };
   }
 
   @Get('ready')
   @HealthCheck()
-  @ApiOperation({ summary: 'Verificação de prontidão' })
-  @ApiOkResponse({ description: 'Serviço e dependências prontas' })
   readiness() {
     return this.health.check([
       () => this.db.pingCheck('database'),
