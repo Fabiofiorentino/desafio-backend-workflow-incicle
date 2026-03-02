@@ -3,6 +3,7 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
+  Index,
 } from 'typeorm';
 
 export abstract class BaseEntity {
@@ -10,6 +11,7 @@ export abstract class BaseEntity {
   id: string;
 
   @Column()
+  @Index()
   company_id: string;
 
   @CreateDateColumn()
