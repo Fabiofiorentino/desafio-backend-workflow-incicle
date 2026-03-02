@@ -17,7 +17,7 @@
 
 Estrutura baseada em separação por camadas:
 
-
+````
 src/
 ├── infra/
 │    ├── database/
@@ -37,6 +37,7 @@ src/
 ├── common/
 ├── test/
 └── app.module.ts
+````
 
 ## Decisão
 
