@@ -3,8 +3,8 @@ GET http://localhost:3000/health
 Accept: application/json
 
 @companyId = {{$processEnv COMPANY_ID}}
-@templateId = ''
-@versionId = ''
+@templateId = 0
+@versionId = 0
 @customerName = 'Admin'
 @orderId = '12345'
 
