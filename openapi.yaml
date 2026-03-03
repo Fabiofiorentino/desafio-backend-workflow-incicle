@@ -11,7 +11,7 @@ servers:
 components:
   parameters:
     CompanyIdHeader:
-      name: x-company-id
+      name: company-id
       in: header
       required: true
       schema:
@@ -23,7 +23,6 @@ components:
       type: object
       required:
         - name
-        - definition
       properties:
         name:
           type: string
@@ -31,23 +30,7 @@ components:
         description:
           type: string
           example: Template para workflow de aprovação de documentos
-        definition:
-          type: object
-          additionalProperties: true
-          example:
-            steps:
-              - name: Aprovador 1
-                type: approval
-
-    CreateVersionDto:
-      type: object
-      required:
-        - definition
-      properties:
-        definition:
-          type: object
-          additionalProperties: true
-
+      
     Template:
       type: object
       properties:
@@ -58,8 +41,6 @@ components:
           type: string
         description:
           type: string
-        definition:
-          type: object
         companyId:
           type: string
           format: uuid
@@ -81,8 +62,6 @@ components:
           format: uuid
         version:
           type: integer
-        definition:
-          type: object
         isActive:
           type: boolean
         createdAt:
@@ -197,12 +176,6 @@ paths:
             type: string
             format: uuid
           description: ID do template
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CreateVersionDto'
       responses:
         '201':
           description: Versão criada com sucesso

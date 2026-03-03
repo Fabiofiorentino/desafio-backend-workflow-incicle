@@ -1,12 +1,17 @@
+###
+
+@companyId = 11111111-1111-1111-1111-111111111111
+@templateId = ADICIONAR_ID_DO_TEMPLATE_AQUI
+@versionId = ADICIONAR_ID_DA_VERSAO_AQUI
+
+###
+
 ### Health check
 GET http://localhost:3000/health
 Accept: application/json
+company-id: {{companyId}}
 
-@companyId = {{$processEnv COMPANY_ID}}
-@templateId = 0
-@versionId = 0
-@customerName = 'Admin'
-@orderId = '12345'
+###
 
 ### Create Template
 POST http://localhost:3000/templates
@@ -14,17 +19,9 @@ Content-Type: application/json
 company-id: {{companyId}}
 
 {
-  "name": "Order Created",
-  "description": "Template for order creation",
-  "definition": {
-    "subject": "Order {{orderId}} created",
-    "body": "Customer {{customerName}}"
-  }
+  "name": "Aprovação de usuario",
+  "description": "Template para aprovação"
 }
-
-> {% 
-   client.global.set("templateId", response.body.id); 
-%}
 
 ###
 
@@ -45,16 +42,7 @@ POST http://localhost:3000/templates/{{templateId}}/versions
 Content-Type: application/json
 company-id: {{companyId}}
 
-{
-  "definition": {
-    "subject": "UPDATED - Order {{orderId}} created",
-    "body": "Customer {{customerName}} - updated version"
-  }
-}
-
-> {% 
-   client.global.set("versionId", response.body.id); 
-%}
+{}
 
 ###
 

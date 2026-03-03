@@ -23,12 +23,11 @@ export class TemplatesService {
     private readonly dataSource: DataSource,
   ) {}
 
-  // Criar template + versão 1 draft
+  // Criar template
   async createTemplate(
     companyId: string,
     name: string,
     description: string | undefined,
-    definition: Record<string, any>,
   ): Promise<Template> {
     const template = this.templateRepo.create({
       companyId,
@@ -42,7 +41,6 @@ export class TemplatesService {
       templateId: template.id,
       version: 1,
       status: TemplateVersionStatus.DRAFT,
-      definition,
     });
 
     await this.versionRepo.save(version);
@@ -76,7 +74,6 @@ export class TemplatesService {
   async createNewVersion(
     companyId: string,
     templateId: string,
-    definition: Record<string, any>,
   ): Promise<TemplateVersion> {
     const template = await this.templateRepo.findOne({
       where: { id: templateId, companyId },
@@ -98,7 +95,6 @@ export class TemplatesService {
       templateId,
       version: nextVersion,
       status: TemplateVersionStatus.DRAFT,
-      definition,
     });
 
     return this.versionRepo.save(version);

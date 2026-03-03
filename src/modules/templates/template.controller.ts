@@ -9,7 +9,6 @@ import {
 } from '@nestjs/common';
 import { TemplatesService } from './template.service';
 import { CreateTemplateDto } from './dto/create-template.dto';
-import { CreateVersionDto } from './dto/create-version.dto';
 
 @Controller('templates')
 export class TemplatesController {
@@ -36,7 +35,6 @@ export class TemplatesController {
       companyId,
       dto.name,
       dto.description,
-      dto.definition,
     );
   }
 
@@ -59,14 +57,9 @@ export class TemplatesController {
   async createVersion(
     @Headers() headers: Record<string, string>,
     @Param('id') id: string,
-    @Body() dto: CreateVersionDto,
   ) {
     const companyId = this.extractCompanyId(headers);
-    return this.templatesService.createNewVersion(
-      companyId,
-      id,
-      dto.definition,
-    );
+    return this.templatesService.createNewVersion(companyId, id);
   }
 
   @Post(':id/versions/:versionId/publish')

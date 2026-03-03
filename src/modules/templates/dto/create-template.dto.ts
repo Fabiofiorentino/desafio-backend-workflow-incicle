@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsObject, IsOptional, IsString } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class CreateTemplateDto {
   @IsString()
@@ -8,7 +8,4 @@ export class CreateTemplateDto {
   @IsOptional()
   @IsString()
   description?: string;
-
-  @IsObject()
-  definition: Record<string, any>;
 }
