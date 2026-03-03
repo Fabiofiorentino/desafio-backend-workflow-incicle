@@ -13,6 +13,12 @@ company-id: {{companyId}}
 
 ###
 
+GET http://localhost:3000/health/ready
+Accept: application/json
+company-id: {{companyId}}
+
+###
+
 ### Create Template
 POST http://localhost:3000/templates
 Content-Type: application/json
