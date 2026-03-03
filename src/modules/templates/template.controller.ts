@@ -18,7 +18,9 @@ export class TemplatesController {
     const companyId = headers['company-id'];
 
     if (!companyId) {
-      throw new BadRequestException('company-id header is required');
+      throw new BadRequestException(
+        'É necessario fornecer o header "company-id"',
+      );
     }
 
     return companyId;
@@ -72,6 +74,6 @@ export class TemplatesController {
 
     await this.templatesService.publishVersion(companyId, id, versionId);
 
-    return { message: 'Version published successfully' };
+    return { message: 'Versão publlicada com sucesso.' };
   }
 }
