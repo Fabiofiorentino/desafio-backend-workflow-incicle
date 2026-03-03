@@ -6,6 +6,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { RabbitModule } from './infra/rabbitmq/rabbit.module';
 import { HealthModule } from './infra/health/health.module';
 import { TemplatesModule } from './modules/templates/template.module';
+import { InstancesModule } from './modules/instances/instance.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { TemplatesModule } from './modules/templates/template.module';
     RabbitModule,
     HealthModule,
     TemplatesModule,
+    InstancesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

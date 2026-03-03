@@ -77,6 +77,70 @@ components:
         info:
           type: object
 
+        CreateInstanceDto:
+      type: object
+      required:
+        - templateVersionId
+      properties:
+        templateVersionId:
+          type: string
+          format: uuid
+          example: b3b5c2f0-8c3f-4c9e-9b2e-0e3d3b2a6d01
+
+    Instance:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        templateVersionId:
+          type: string
+          format: uuid
+        snapshot:
+          type: object
+          description: Snapshot imutável da versão do template
+        status:
+          type: string
+          enum:
+            - draft
+            - submitted
+        submittedAt:
+          type: string
+          format: date-time
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    InstanceTimelineEvent:
+      type: object
+      properties:
+        type:
+          type: string
+          example: submitted
+        date:
+          type: string
+          format: date-time
+
+    InstanceTimeline:
+      type: object
+      properties:
+        instanceId:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum:
+            - draft
+            - submitted
+        events:
+          type: array
+          items:
+            $ref: '#/components/schemas/InstanceTimelineEvent'
+
 paths:
   /health:
     get:
@@ -249,5 +313,130 @@ paths:
           description: Template ou versão não encontrado
         '409':
           description: Conflito ao publicar versão
+        '401':
+          description: Não autenticado
+
+    /instances:
+    post:
+      summary: Criar nova instância a partir de uma versão
+      tags:
+        - Instances
+      parameters:
+        - $ref: '#/components/parameters/CompanyIdHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateInstanceDto'
+      responses:
+        '201':
+          description: Instância criada com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Instance'
+        '400':
+          description: Dados inválidos
+        '404':
+          description: Versão não encontrada
+        '401':
+          description: Não autenticado
+
+    get:
+      summary: Listar instâncias da empresa
+      tags:
+        - Instances
+      parameters:
+        - $ref: '#/components/parameters/CompanyIdHeader'
+      responses:
+        '200':
+          description: Lista de instâncias
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Instance'
+        '401':
+          description: Não autenticado
+
+  /instances/{id}:
+    get:
+      summary: Obter instância por ID
+      tags:
+        - Instances
+      parameters:
+        - $ref: '#/components/parameters/CompanyIdHeader'
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: ID da instância
+      responses:
+        '200':
+          description: Detalhes da instância
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Instance'
+        '404':
+          description: Instância não encontrada
+        '401':
+          description: Não autenticado
+
+  /instances/{id}/submit:
+    post:
+      summary: Submeter instância (congela snapshot)
+      tags:
+        - Instances
+      parameters:
+        - $ref: '#/components/parameters/CompanyIdHeader'
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: ID da instância
+      responses:
+        '200':
+          description: Instância submetida com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Instance'
+        '400':
+          description: Instância já submetida
+        '404':
+          description: Instância não encontrada
+        '401':
+          description: Não autenticado
+
+  /instances/{id}/timeline:
+    get:
+      summary: Obter linha do tempo da instância
+      tags:
+        - Instances
+      parameters:
+        - $ref: '#/components/parameters/CompanyIdHeader'
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: ID da instância
+      responses:
+        '200':
+          description: Timeline da instância
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InstanceTimeline'
+        '404':
+          description: Instância não encontrada
         '401':
           description: Não autenticado

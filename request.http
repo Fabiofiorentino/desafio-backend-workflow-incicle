@@ -1,26 +1,28 @@
 ###
 
+@baseUrl = http://localhost:3000
 @companyId = 11111111-1111-1111-1111-111111111111
 @templateId = ADICIONAR_ID_DO_TEMPLATE_AQUI
 @versionId = ADICIONAR_ID_DA_VERSAO_AQUI
+@instanceId = ADICIONAR_ID_DA_INSTANCIA_AQUI
 
 ###
 
 ### Health check
-GET http://localhost:3000/health
+GET {{baseUrl}}/health
 Accept: application/json
 company-id: {{companyId}}
 
 ###
 
-GET http://localhost:3000/health/ready
+GET {{baseUrl}}/health/ready
 Accept: application/json
 company-id: {{companyId}}
 
 ###
 
 ### Create Template
-POST http://localhost:3000/templates
+POST {{baseUrl}}/templates
 Content-Type: application/json
 company-id: {{companyId}}
 
@@ -32,19 +34,19 @@ company-id: {{companyId}}
 ###
 
 ### List Templates
-GET http://localhost:3000/templates
+GET {{baseUrl}}/templates
 company-id: {{companyId}}
 
 ###
 
 ### Get Template by ID
-GET http://localhost:3000/templates/{{templateId}}
+GET {{baseUrl}}/templates/{{templateId}}
 company-id: {{companyId}}
 
 ###
 
 ### Create New Version
-POST http://localhost:3000/templates/{{templateId}}/versions
+POST {{baseUrl}}/templates/{{templateId}}/versions
 Content-Type: application/json
 company-id: {{companyId}}
 
@@ -53,5 +55,30 @@ company-id: {{companyId}}
 ###
 
 ### Publish Version
-POST http://localhost:3000/templates/{{templateId}}/versions/{{versionId}}/publish
+POST {{baseUrl}}/templates/{{templateId}}/versions/{{versionId}}/publish
 company-id: {{companyId}}
+
+###
+
+### Create Instance
+POST {{baseUrl}}/instances
+Content-Type: application/json
+
+{
+  "templateVersionId": "{{versionId}}"
+}
+
+###
+
+### Get All Instances
+GET {{baseUrl}}/instances
+
+###
+
+### Get Instance By ID
+GET {{baseUrl}}/instances/{{instanceId}}
+
+###
+
+### Submit Instance
+POST {{baseUrl}}/instances/{{instanceId}}/submit
