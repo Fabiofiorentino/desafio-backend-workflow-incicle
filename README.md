@@ -3,10 +3,16 @@
 
 📌 Sobre o Projeto
 
-API de workflow de aprovações corporativas para ambiente multiempresa, com suporte a multi-tenant, controle de publicação e versionamento simples.
+API de workflow de aprovações corporativas para ambiente multiempresa (multi-tenant).
 
-Cada empresa (company_id) possui seus próprios templates isolados.
-Cada template pode possuir múltiplas versões, mas apenas uma pode estar publicada por vez.
+Cada empresa (company-id via header) possui:
+  - Templates isolados
+  - Múltiplas versões por template
+  - Apenas uma versão publicada por vez
+  - Instâncias criadas a partir de versões
+  - Snapshot imutável após submissão
+
+O sistema simula um fluxo real de workflow corporativo com controle de versionamento e congelamento de dados.
 
 ## Stack
 
@@ -17,6 +23,7 @@ Cada template pode possuir múltiplas versões, mas apenas uma pode estar public
 - **Containerização:** Docker + Docker Compose  
 - **Testes:** Jest  
 - **Healthcheck:** @nestjs/terminus  
+- **Documentação:** OpenAPI 3.0.3 (openapi.yaml)
 
 ---
 
@@ -44,10 +51,11 @@ Estrutura baseada em separação por camadas:
 |   |    ├── user/
 |   └──  common/
 ├── test/
+|     ├── health.e2e-spec.ts
+|     ├── instances.e2e-spec.ts
 ├── app.module.ts
 ├── openapi.yaml
 ├── request.http
-├── README.md
 ├── docker-compose.yml
 └── Dockerfile
 ````
@@ -118,20 +126,28 @@ npm run test
 
 # Arquitetura
 
-## Decisão
+**Decisão**
 
-Separar **infraestrutura de domínio**.
+Separar clara enter:
+  - Camada de domíonio (modules)
+  - Infraestrutura (database, messaging, health)
+  - Infraestrutura (database, messaging, health)
 
-### Trade-off
+**Trade-off**
 
 Mais organização e escalabilidade   
 
 ---
 
+# Multi-tenant
+
+- Header obrigatório: company-id
+- Templates são isolados por empresa
+- Acesso cruzado entre empresas é bloqueado
+
 # Health Checks
 
 - /health → aplicação viva
-
 - /health/ready → banco e Rabbit conectados
 
 Decisão: readiness separado de liveness.

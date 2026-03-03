@@ -7,6 +7,7 @@ export class CreateInstancesTable1700000000000 implements MigrationInterface {
     await queryRunner.query(`
       CREATE TABLE "instances" (
         "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
+        "company_id" uuid NOT NULL,
         "template_version_id" uuid NOT NULL,
         "snapshot" jsonb NOT NULL,
         "status" varchar NOT NULL DEFAULT 'draft',

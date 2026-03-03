@@ -24,6 +24,7 @@ export class Instance {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
+  @Index()
   @Column({ type: 'uuid' })
   companyId: string;
 
