@@ -19,7 +19,7 @@ export class InstancesService {
 
     @InjectRepository(TemplateVersion)
     private readonly templateVersionRepo: Repository<TemplateVersion>,
-  ) { }
+  ) {}
 
   async create(
     companyId: string,
