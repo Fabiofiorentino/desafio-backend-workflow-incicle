@@ -119,7 +119,7 @@ describe('TemplatesService', () => {
         .mockResolvedValueOnce({ id: 'template1' })
         .mockResolvedValueOnce({
           id: 'v2',
-          status: TemplateVersionStatus.PUBLISHED,
+          status: TemplateVersionStatus.DRAFT,
           template: { companyId: 'c1' },
         });
 
