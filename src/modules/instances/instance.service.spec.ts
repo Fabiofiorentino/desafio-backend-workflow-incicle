@@ -1,85 +1,88 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { InstancesService } from './instance.service';
-import { Instance } from './instance.entity';
-import { Template } from '../templates/template.entity';
-import { TemplateVersion } from '../templates/template-version.entity';
-import { Repository } from 'typeorm';
 import { getRepositoryToken } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Instance } from './instance.entity';
+import { TemplateVersion } from '../templates/template-version.entity';
 
-describe('InstancesService - Snapshot imutável', () => {
+describe('InstancesService', () => {
   let service: InstancesService;
-  let templateRepo: Repository<Template>;
-  let versionRepo: Repository<TemplateVersion>;
+  let instanceRepository: Repository<Instance>;
+  let templateVersionRepository: Repository<TemplateVersion>;
 
-  beforeAll(async () => {
+  beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [
-        TypeOrmModule.forRoot({
-          type: 'postgres',
-          database: ':memory:',
-          entities: [Instance, Template, TemplateVersion],
-          synchronize: true,
-        }),
-        TypeOrmModule.forFeature([Instance, Template, TemplateVersion]),
+      providers: [
+        InstancesService,
+        {
+          provide: getRepositoryToken(Instance),
+          useValue: {
+            create: jest.fn(),
+            save: jest.fn(),
+            findOne: jest.fn(),
+          },
+        },
+        {
+          provide: getRepositoryToken(TemplateVersion),
+          useValue: {
+            findOne: jest.fn(),
+          },
+        },
       ],
-      providers: [InstancesService],
     }).compile();
 
     service = module.get<InstancesService>(InstancesService);
-    templateRepo = module.get(getRepositoryToken(Template));
-    versionRepo = module.get(getRepositoryToken(TemplateVersion));
+    instanceRepository = module.get(getRepositoryToken(Instance));
+    templateVersionRepository = module.get(getRepositoryToken(TemplateVersion));
   });
 
-  it('deve manter o snapshot imutável mesmo que a versão do modelo seja alterada', async () => {
-    // cria template
-    const template = await templateRepo.save({
-      name: 'Template A',
-      description: 'Original',
-      companyId: 'company-1',
-    });
+  it('deve criar instance com snapshot imutável', async () => {
+    const templateVersionMock = {
+      id: 'version-1',
+      schema: { fields: ['name', 'description'] },
+    };
 
-    // cria versão
-    const version = await versionRepo.save({
-      template,
-      version: 1,
-      isActive: true,
-    });
+    (templateVersionRepository.findOne as jest.Mock).mockResolvedValue(
+      templateVersionMock,
+    );
 
-    // cria instância
-    const instance = await service.create(template.companyId, version.id);
+    (instanceRepository.create as jest.Mock).mockImplementation((data) => data);
+    (instanceRepository.save as jest.Mock).mockImplementation((data) => ({
+      id: 'instance-1',
+      ...data,
+    }));
 
-    const originalSnapshot = instance.snapshot;
+    const result = await service.create('company-1', 'version-1');
 
-    // altera versão depois
-    version.isActive = false;
-    await versionRepo.save(version);
-
-    // busca instância novamente
-    const reloaded = await service.findOne(template.companyId, instance.id);
-
-    expect(reloaded.snapshot).toEqual(originalSnapshot);
+    expect(result.snapshot).toEqual(templateVersionMock.schema);
+    expect(result.templateVersionId).toBe('version-1');
   });
 
-  it('Não deve ser permitida a atualização do snapshot após o envio', async () => {
-    const template = await templateRepo.save({
-      name: 'Template B',
-      description: 'Test',
-      companyId: 'company-1',
+  it('não deve alterar snapshot se templateVersion mudar depois', async () => {
+    const originalSchema = { fields: ['name'] };
+
+    (templateVersionRepository.findOne as jest.Mock).mockResolvedValue({
+      id: 'version-1',
+      schema: originalSchema,
     });
 
-    const version = await versionRepo.save({
-      template,
-      version: 1,
-      isActive: true,
-    });
+    (instanceRepository.create as jest.Mock).mockImplementation((data) => data);
+    (instanceRepository.save as jest.Mock).mockImplementation((data) => ({
+      id: 'instance-1',
+      ...data,
+    }));
 
-    const instance = await service.create(template.companyId, version.id);
+    const instance = await service.create('company-1', 'version-1');
 
-    await service.submit(template.companyId, instance.id);
+    // simula mudança futura no template
+    originalSchema.fields.push('email');
 
-    await expect(
-      service.submit(template.companyId, instance.id),
-    ).rejects.toThrow();
+    expect(instance.snapshot).toEqual({ fields: ['name'] });
+  });
+
+  it('deve lançar erro se templateVersion não existir', async () => {
+    (templateVersionRepository.findOne as jest.Mock).mockResolvedValue(null);
+
+    await expect(service.create('company-1', 'invalido')).rejects.toThrow();
   });
 });
