@@ -27,7 +27,8 @@ export class TemplatesService {
   async createTemplate(
     companyId: string,
     name: string,
-    description: string | undefined,
+    description?: string,
+    schema: Record<string, any> = {},
   ): Promise<Template> {
     const template = this.templateRepo.create({
       companyId,
@@ -41,6 +42,7 @@ export class TemplatesService {
       templateId: template.id,
       version: 1,
       status: TemplateVersionStatus.DRAFT,
+      schema,
     });
 
     await this.versionRepo.save(version);
@@ -95,6 +97,7 @@ export class TemplatesService {
       templateId,
       version: nextVersion,
       status: TemplateVersionStatus.DRAFT,
+      schema: lastVersion?.schema ?? {},
     });
 
     return this.versionRepo.save(version);
@@ -116,10 +119,14 @@ export class TemplatesService {
       }
 
       const version = await manager.findOne(TemplateVersion, {
-        where: { id: versionId, templateId },
+        where: {
+          id: versionId,
+          templateId,
+        },
+        relations: ['template'],
       });
 
-      if (!version) {
+      if (!version || version.template.companyId !== companyId) {
         throw new NotFoundException('Version not found');
       }
 

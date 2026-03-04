@@ -25,6 +25,7 @@ export class CreateTemplates1700001000000 implements MigrationInterface {
         template_id uuid NOT NULL,
         version int NOT NULL,
         status varchar NOT NULL DEFAULT 'DRAFT',
+        schema jsonb NOT NULL DEFAULT '{}'::jsonb,
         created_at timestamptz NOT NULL DEFAULT now(),
         CONSTRAINT fk_template
           FOREIGN KEY(template_id)

@@ -33,11 +33,13 @@ export class TemplateVersion {
   version: number;
 
   @Column({
-    type: 'enum',
-    enum: TemplateVersionStatus,
-    default: TemplateVersionStatus.DRAFT,
+    type: 'varchar',
+    default: 'DRAFT',
   })
   status: TemplateVersionStatus;
+
+  @Column({ type: 'jsonb', default: () => "'{}'" })
+  schema: Record<string, any>;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;

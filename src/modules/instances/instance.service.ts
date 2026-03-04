@@ -21,17 +21,14 @@ export class InstancesService {
     private readonly templateVersionRepo: Repository<TemplateVersion>,
   ) {}
 
-  async create(
-    companyId: string,
-    templateVersionId: string,
-  ): Promise<Instance> {
+  async create(companyId: string, templateVersionId: string) {
     const templateVersion = await this.templateVersionRepo.findOne({
       where: {
         id: templateVersionId,
+        status: TemplateVersionStatus.PUBLISHED,
         template: {
           companyId,
         },
-        status: TemplateVersionStatus.PUBLISHED,
       },
       relations: ['template'],
     });
@@ -44,12 +41,9 @@ export class InstancesService {
 
     const instance = this.instanceRepo.create({
       companyId,
-      templateVersionId: templateVersion.id,
-      snapshot: {
-        version: templateVersion.version,
-        templateId: templateVersion.templateId,
-      },
-      status: 'draft',
+      templateVersionId,
+      snapshot: JSON.parse(JSON.stringify(templateVersion.schema)),
+      status: 'DRAFT',
     });
 
     return this.instanceRepo.save(instance);
