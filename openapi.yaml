@@ -85,7 +85,6 @@ components:
         templateVersionId:
           type: string
           format: uuid
-          example: b3b5c2f0-8c3f-4c9e-9b2e-0e3d3b2a6d01
 
     Instance:
       type: object
@@ -93,17 +92,18 @@ components:
         id:
           type: string
           format: uuid
+        companyId:
+          type: string
+          format: uuid
         templateVersionId:
           type: string
           format: uuid
         snapshot:
           type: object
-          description: Snapshot imutável da versão do template
+          additionalProperties: true
         status:
           type: string
-          enum:
-            - draft
-            - submitted
+          enum: [DRAFT, SUBMITTED]
         submittedAt:
           type: string
           format: date-time
@@ -115,16 +115,6 @@ components:
           type: string
           format: date-time
 
-    InstanceTimelineEvent:
-      type: object
-      properties:
-        type:
-          type: string
-          example: submitted
-        date:
-          type: string
-          format: date-time
-
     InstanceTimeline:
       type: object
       properties:
@@ -133,13 +123,18 @@ components:
           format: uuid
         status:
           type: string
-          enum:
-            - draft
-            - submitted
+          enum: [DRAFT, SUBMITTED]
         events:
           type: array
           items:
-            $ref: '#/components/schemas/InstanceTimelineEvent'
+            type: object
+            properties:
+              type:
+                type: string
+                example: created
+              date:
+                type: string
+                format: date-time
 
 paths:
   /health:
@@ -316,56 +311,42 @@ paths:
         '401':
           description: Não autenticado
 
-    /instances:
-      post:
-        summary: Criar nova instância a partir de uma versão
-        tags:
-          - Instances
-        parameters:
-          - $ref: '#/components/parameters/CompanyIdHeader'
-        requestBody:
-          required: true
+  /instances:
+    post:
+      summary: Criar uma nova instância
+      parameters:
+        - $ref: '#/components/parameters/CompanyIdHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateInstanceDto'
+      responses:
+        '201':
+          description: Instância criada
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CreateInstanceDto'
-        responses:
-          '201':
-            description: Instância criada com sucesso
-            content:
-              application/json:
-                schema:
-                  $ref: '#/components/schemas/Instance'
-          '400':
-            description: Dados inválidos
-          '404':
-            description: Versão não encontrada
-          '401':
-            description: Não autenticado
+                $ref: '#/components/schemas/Instance'
 
-      get:
-        summary: Listar instâncias da empresa
-        tags:
-          - Instances
-        parameters:
-          - $ref: '#/components/parameters/CompanyIdHeader'
-        responses:
-          '200':
-            description: Lista de instâncias
-            content:
-              application/json:
-                schema:
-                  type: array
-                  items:
-                    $ref: '#/components/schemas/Instance'
-          '401':
-            description: Não autenticado
+    get:
+      summary: Listar instâncias da empresa
+      parameters:
+        - $ref: '#/components/parameters/CompanyIdHeader'
+      responses:
+        '200':
+          description: Lista de instâncias
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Instance'
 
   /instances/{id}:
     get:
-      summary: Obter instância por ID
-      tags:
-        - Instances
+      summary: Buscar instância por ID
       parameters:
         - $ref: '#/components/parameters/CompanyIdHeader'
         - name: id
@@ -374,18 +355,15 @@ paths:
           schema:
             type: string
             format: uuid
-          description: ID da instância
       responses:
         '200':
-          description: Detalhes da instância
+          description: Instância encontrada
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Instance'
         '404':
           description: Instância não encontrada
-        '401':
-          description: Não autenticado
 
   /instances/{id}/submit:
     post:
@@ -415,11 +393,9 @@ paths:
         '401':
           description: Não autenticado
 
-  /instances/{id}/timeline:
-    get:
-      summary: Obter linha do tempo da instância
-      tags:
-        - Instances
+  /instances/{id}/submit:
+    post:
+      summary: Submeter instância
       parameters:
         - $ref: '#/components/parameters/CompanyIdHeader'
         - name: id
@@ -428,15 +404,14 @@ paths:
           schema:
             type: string
             format: uuid
-          description: ID da instância
       responses:
         '200':
-          description: Timeline da instância
+          description: Instância submetida
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/InstanceTimeline'
+                $ref: '#/components/schemas/Instance'
+        '400':
+          description: Já submetida
         '404':
-          description: Instância não encontrada
-        '401':
-          description: Não autenticado
+          description: Não encontrada
