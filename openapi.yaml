@@ -77,7 +77,7 @@ components:
         info:
           type: object
 
-        CreateInstanceDto:
+    CreateInstanceDto:
       type: object
       required:
         - templateVersionId
@@ -317,49 +317,49 @@ paths:
           description: Não autenticado
 
     /instances:
-    post:
-      summary: Criar nova instância a partir de uma versão
-      tags:
-        - Instances
-      parameters:
-        - $ref: '#/components/parameters/CompanyIdHeader'
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CreateInstanceDto'
-      responses:
-        '201':
-          description: Instância criada com sucesso
+      post:
+        summary: Criar nova instância a partir de uma versão
+        tags:
+          - Instances
+        parameters:
+          - $ref: '#/components/parameters/CompanyIdHeader'
+        requestBody:
+          required: true
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Instance'
-        '400':
-          description: Dados inválidos
-        '404':
-          description: Versão não encontrada
-        '401':
-          description: Não autenticado
-
-    get:
-      summary: Listar instâncias da empresa
-      tags:
-        - Instances
-      parameters:
-        - $ref: '#/components/parameters/CompanyIdHeader'
-      responses:
-        '200':
-          description: Lista de instâncias
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
+                $ref: '#/components/schemas/CreateInstanceDto'
+        responses:
+          '201':
+            description: Instância criada com sucesso
+            content:
+              application/json:
+                schema:
                   $ref: '#/components/schemas/Instance'
-        '401':
-          description: Não autenticado
+          '400':
+            description: Dados inválidos
+          '404':
+            description: Versão não encontrada
+          '401':
+            description: Não autenticado
+
+      get:
+        summary: Listar instâncias da empresa
+        tags:
+          - Instances
+        parameters:
+          - $ref: '#/components/parameters/CompanyIdHeader'
+        responses:
+          '200':
+            description: Lista de instâncias
+            content:
+              application/json:
+                schema:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Instance'
+          '401':
+            description: Não autenticado
 
   /instances/{id}:
     get:
