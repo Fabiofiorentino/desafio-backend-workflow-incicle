@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Instance } from './instance.entity';
+import { Instance, InstanceStatus } from './instance.entity';
 import {
   TemplateVersion,
   TemplateVersionStatus,
@@ -43,7 +43,7 @@ export class InstancesService {
       companyId,
       templateVersionId,
       snapshot: JSON.parse(JSON.stringify(templateVersion.schema)),
-      status: 'DRAFT',
+      status: InstanceStatus.DRAFT,
     });
 
     return this.instanceRepo.save(instance);
@@ -52,11 +52,11 @@ export class InstancesService {
   async submit(companyId: string, id: string): Promise<Instance> {
     const instance = await this.findOne(companyId, id);
 
-    if (instance.status === 'submitted') {
+    if (instance.status === InstanceStatus.SUBMITTED) {
       throw new BadRequestException('Instância já submetida');
     }
 
-    instance.status = 'submitted';
+    instance.status = InstanceStatus.SUBMITTED;
     instance.submittedAt = new Date();
 
     return this.instanceRepo.save(instance);

@@ -38,7 +38,7 @@ export class Instance {
 
   @Column({
     type: 'varchar',
-    default: 'draft',
+    default: InstanceStatus.DRAFT,
   })
   status: string;
 

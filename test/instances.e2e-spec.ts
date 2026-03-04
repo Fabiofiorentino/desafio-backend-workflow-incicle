@@ -52,7 +52,7 @@ describe('Instances E2E', () => {
 
     instanceId = instanceRes.body.id;
 
-    expect(instanceRes.body.status).toBe('draft');
+    expect(instanceRes.body.status).toBe('DRAFT');
 
     // submit
     const submitRes = await request(app.getHttpServer())
@@ -60,7 +60,7 @@ describe('Instances E2E', () => {
       .set('company-id', 'company-1')
       .expect(200);
 
-    expect(submitRes.body.status).toBe('submitted');
+    expect(submitRes.body.status).toBe('SUBMITTED');
 
     // timeline
     const timelineRes = await request(app.getHttpServer())

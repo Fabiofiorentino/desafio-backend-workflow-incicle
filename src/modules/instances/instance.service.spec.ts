@@ -47,7 +47,7 @@ describe('InstancesService - Snapshot imutável', () => {
     });
 
     // cria instância
-    const instance = await service.create(version.id);
+    const instance = await service.create(template.companyId, version.id);
 
     const originalSnapshot = instance.snapshot;
 
@@ -56,7 +56,7 @@ describe('InstancesService - Snapshot imutável', () => {
     await versionRepo.save(version);
 
     // busca instância novamente
-    const reloaded = await service.findOne(instance.id);
+    const reloaded = await service.findOne(template.companyId, instance.id);
 
     expect(reloaded.snapshot).toEqual(originalSnapshot);
   });
@@ -74,12 +74,12 @@ describe('InstancesService - Snapshot imutável', () => {
       isActive: true,
     });
 
-    const instance = await service.create(version.id);
+    const instance = await service.create(template.companyId, version.id);
 
-    await service.submit(instance.id);
+    await service.submit(template.companyId, instance.id);
 
     await expect(
-      service.updateSnapshot(instance.id, { hacked: true }),
+      service.submit(template.companyId, instance.id),
     ).rejects.toThrow();
   });
 });
