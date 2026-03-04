@@ -37,6 +37,7 @@ export class TemplatesController {
       companyId,
       dto.name,
       dto.description,
+      dto.schema,
     );
   }
 

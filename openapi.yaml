@@ -64,6 +64,10 @@ components:
           type: integer
         isActive:
           type: boolean
+          schema:
+            type: object
+            description: Estrutura do workflow congelada na versão
+            additionalProperties: true
         createdAt:
           type: string
           format: date-time
@@ -100,6 +104,7 @@ components:
           format: uuid
         snapshot:
           type: object
+          description: Snapshot imutável do schema da versão publicada
           additionalProperties: true
         status:
           type: string

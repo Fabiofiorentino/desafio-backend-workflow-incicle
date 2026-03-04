@@ -242,6 +242,7 @@ A documentação da API está disponível em [http://localhost:8081](http://loca
 ✔ Testes e2e funcionando
 ✔ Módulo Templates (Criar template, Criar versão, Publicar versão, Garantir apenas 1 publicada por template)
 ✔ Testes unitário para service do módulo Templates
+✔ Modulo Instances (Criar, Listar, Submeter)
 
 
 
