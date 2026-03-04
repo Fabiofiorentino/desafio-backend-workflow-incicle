@@ -18,9 +18,12 @@ export class InstancesService {
     private readonly templateVersionRepo: Repository<TemplateVersion>,
   ) {}
 
-  async create(templateVersionId: string): Promise<Instance> {
+  async create(
+    companyId: string,
+    templateVersionId: string,
+  ): Promise<Instance> {
     const templateVersion = await this.templateVersionRepo.findOne({
-      where: { id: templateVersionId },
+      where: { companyId, id: templateVersionId },
     });
 
     if (!templateVersion) {
@@ -38,8 +41,11 @@ export class InstancesService {
     return this.instanceRepo.save(instance);
   }
 
-  async submit(id: string): Promise<Instance> {
-    const instance = await this.findOne(id);
+  async submit(companyId: string, id: string): Promise<Instance> {
+    const instance = await this.findOne({
+      where: { id, companyId },
+      relations: ['templateVersion'],
+    });
 
     if (instance.status === InstanceStatus.SUBMITTED) {
       throw new BadRequestException('Instância já foi submetida');
@@ -51,16 +57,17 @@ export class InstancesService {
     return this.instanceRepo.save(instance);
   }
 
-  async findAll(): Promise<Instance[]> {
+  async findAll(companyId: string): Promise<Instance[]> {
     return this.instanceRepo.find({
+      where: { companyId },
       relations: ['templateVersion'],
       order: { createdAt: 'DESC' },
     });
   }
 
-  async findOne(id: string): Promise<Instance> {
+  async findOne(companyId: string, id: string): Promise<Instance> {
     const instance = await this.instanceRepo.findOne({
-      where: { id },
+      where: { id, companyId },
       relations: ['templateVersion'],
     });
 
@@ -71,8 +78,8 @@ export class InstancesService {
     return instance;
   }
 
-  async getTimeline(id: string) {
-    const instance = await this.findOne(id);
+  async getTimeline(companyId: string, id: string) {
+    const instance = await this.findOne(companyId, id);
 
     const timeline = [
       {
@@ -95,8 +102,12 @@ export class InstancesService {
     };
   }
 
-  async updateSnapshot(id: string, newSnapshot: any): Promise<Instance> {
-    const instance = await this.findOne(id);
+  async updateSnapshot(
+    companyId: string,
+    id: string,
+    newSnapshot: any,
+  ): Promise<Instance> {
+    const instance = await this.findOne(companyId, id);
 
     if (instance.status === InstanceStatus.SUBMITTED) {
       throw new BadRequestException(

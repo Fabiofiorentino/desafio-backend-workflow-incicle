@@ -9,7 +9,6 @@ import {
   Index,
 } from 'typeorm';
 
-import { Template } from '../templates/template.entity';
 import { TemplateVersion } from '../templates/template-version.entity';
 
 export enum InstanceStatus {
@@ -19,50 +18,36 @@ export enum InstanceStatus {
 
 @Entity('instances')
 @Index(['companyId'])
-@Index(['templateId'])
+@Index(['templateVersionId'])
 export class Instance {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Index()
-  @Column({ type: 'uuid' })
+  @Column({ name: 'company_id', type: 'uuid' })
   companyId: string;
 
-  @Column({ type: 'uuid' })
-  templateId: string;
+  @Column({ name: 'template_version_id', type: 'uuid' })
+  templateVersionId: string;
 
-  @ManyToOne(() => Template, { onDelete: 'RESTRICT' })
-  @JoinColumn({ name: 'templateId' })
-  template: Template;
-
-  @Column({ type: 'uuid' })
-  versionId: string;
-
-  @ManyToOne(() => TemplateVersion, { onDelete: 'RESTRICT' })
-  @JoinColumn({ name: 'versionId' })
+  @ManyToOne(() => TemplateVersion, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'template_version_id' })
   templateVersion: TemplateVersion;
 
-  // Dados enviados pelo cliente
-  @Column({ type: 'jsonb', nullable: true })
-  payload: Record<string, any>;
-
-  // Snapshot imutável da versão no momento do submit
-  @Column({ type: 'jsonb', nullable: true })
-  snapshot: Record<string, any> | null;
+  @Column({ type: 'jsonb' })
+  snapshot: Record<string, any>;
 
   @Column({
-    type: 'enum',
-    enum: InstanceStatus,
-    default: InstanceStatus.DRAFT,
+    type: 'varchar',
+    default: 'draft',
   })
-  status: InstanceStatus;
+  status: string;
 
-  @CreateDateColumn()
+  @Column({ name: 'submitted_at', type: 'timestamp', nullable: true })
+  submittedAt: Date | null;
+
+  @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
-
-  @Column({ type: 'timestamp', nullable: true })
-  submittedAt: Date | null;
 }
