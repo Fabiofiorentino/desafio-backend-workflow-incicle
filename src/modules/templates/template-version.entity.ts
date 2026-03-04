@@ -39,6 +39,9 @@ export class TemplateVersion {
   })
   status: TemplateVersionStatus;
 
+  @Column({ type: 'jsonb' })
+  schema: Record<string, any>;
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 }
