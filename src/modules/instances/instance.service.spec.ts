@@ -16,7 +16,7 @@ describe('InstancesService - Snapshot imutável', () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [
         TypeOrmModule.forRoot({
-          type: 'sqlite',
+          type: 'postgres',
           database: ':memory:',
           entities: [Instance, Template, TemplateVersion],
           synchronize: true,

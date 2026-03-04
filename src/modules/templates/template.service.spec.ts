@@ -93,6 +93,7 @@ describe('TemplatesService', () => {
       templateId: 'template1',
       version: 1,
       status: TemplateVersionStatus.DRAFT,
+      schema: {},
     });
 
     expect(versionRepository.save).toHaveBeenCalled();
@@ -115,11 +116,12 @@ describe('TemplatesService', () => {
   describe('publishVersion', () => {
     it('deve publicar versão e despublicar anterior', async () => {
       managerMock.findOne
-        .mockResolvedValueOnce({ id: 'template1' }) // template
+        .mockResolvedValueOnce({ id: 'template1' })
         .mockResolvedValueOnce({
           id: 'v2',
-          status: TemplateVersionStatus.DRAFT,
-        }); // versão
+          status: TemplateVersionStatus.PUBLISHED,
+          template: { companyId: 'c1' },
+        });
 
       await service.publishVersion('c1', 'template1', 'v2');
 
@@ -166,6 +168,7 @@ describe('TemplatesService', () => {
         .mockResolvedValueOnce({
           id: 'v2',
           status: TemplateVersionStatus.PUBLISHED,
+          template: { companyId: 'c1' },
         });
 
       await expect(
